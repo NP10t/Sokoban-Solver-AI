@@ -1,0 +1,87 @@
+BFS
+Steps: 4, Weight: 20, Node: 14, Time (ms): 11.99, Memory (MB): 0.04
+rrRR
+BFS
+Steps: 4, Weight: 20, Node: 14, Time (ms): 6.46, Memory (MB): 0.04
+rrRR
+BFS
+Steps: 4, Weight: 20, Node: 14, Time (ms): 6.85, Memory (MB): 0.04
+rrRR
+BFS
+Steps: 4, Weight: 20, Node: 14, Time (ms): 6.01, Memory (MB): 0.04
+rrRR
+BFS
+Steps: 4, Weight: 20, Node: 14, Time (ms): 5.76, Memory (MB): 0.04
+rrRR
+BFS
+Steps: 4, Weight: 20, Node: 14, Time (ms): 8.31, Memory (MB): 0.00
+rrRR
+BFS
+Steps: 4, Weight: 20, Node: 14, Time (ms): 2.01, Memory (MB): 0.00
+rrRR
+BFS
+Steps: 4, Weight: 20, Node: 14, Time (ms): 3.01, Memory (MB): 0.04
+rrRR
+UCS
+Steps: 4, Weight: 20, Node: 76, Time (ms): 28.73, Memory (MB): 4.31
+rrRR
+BFS
+Steps: 4, Weight: 20, Node: 14, Time (ms): 5.98, Memory (MB): 0.04
+rrRR
+UCS
+Steps: 4, Weight: 20, Node: 76, Time (ms): 80.95, Memory (MB): -3.96
+rrRR
+DFS
+Steps: 4, Weight: 20, Node: 5, Time (ms): 2.08, Memory (MB): 0.02
+rrRR
+DFS
+Steps: 4, Weight: 20, Node: 5, Time (ms): 2.05, Memory (MB): 0.00
+rrRR
+DFS
+Steps: 4, Weight: 20, Node: 5, Time (ms): 1.67, Memory (MB): 0.02
+rrRR
+DFS
+Steps: 4, Weight: 20, Node: 5, Time (ms): 2.26, Memory (MB): 0.00
+rrRR
+DFS
+Steps: 4, Weight: 20, Node: 5, Time (ms): 2.55, Memory (MB): 0.00
+rrRR
+A*
+Steps: 4, Weight: 20, Node: 21, Time (ms): 13.13, Memory (MB): 0.00
+rrRR
+UCS
+Steps: 4, Weight: 20, Node: 76, Time (ms): 71.64, Memory (MB): -4.08
+rrRR
+DFS
+Steps: 4, Weight: 20, Node: 5, Time (ms): 2.00, Memory (MB): 0.01
+rrRR
+DFS
+Steps: 4, Weight: 20, Node: 5, Time (ms): 2.32, Memory (MB): 0.02
+rrRR
+DFS
+Steps: 4, Weight: 20, Node: 5, Time (ms): 4.71, Memory (MB): 0.02
+rrRR
+DFS
+Steps: 4, Weight: 20, Node: 5, Time (ms): 2.95, Memory (MB): 0.01
+rrRR
+DFS
+Steps: 4, Weight: 20, Node: 5, Time (ms): 2.52, Memory (MB): 0.02
+rrRR
+DFS
+Steps: 4, Weight: 20, Node: 5, Time (ms): 1.17, Memory (MB): 0.02
+rrRR
+DFS
+Steps: 4, Weight: 20, Node: 5, Time (ms): 1.00, Memory (MB): 0.02
+rrRR
+DFS
+Steps: 4, Weight: 20, Node: 5, Time (ms): 1.00, Memory (MB): 0.02
+rrRR
+DFS
+Steps: 4, Weight: 20, Node: 5, Time (ms): 1.42, Memory (MB): 0.02
+rrRR
+DFS
+Steps: 4, Weight: 20, Node: 5, Time (ms): 1.97, Memory (MB): 0.02
+rrRR
+DFS
+Steps: 4, Weight: 20, Node: 5, Time (ms): 1.08, Memory (MB): 0.02
+rrRR
