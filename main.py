@@ -101,13 +101,32 @@ class VictoryScreen:
         self.overlay.blit(shadow_surface, shadow_rect)
         self.overlay.blit(text_surface, win_rect)
         
+        def draw_text_with_border(surface, text, font, position, text_color, border_color, border_width=2):
+            text_surface = font.render(text, True, text_color)
+            text_rect = text_surface.get_rect(center=position)
+
+            # Tạo các bản sao của text dịch chuyển theo các hướng để tạo viền
+            for dx, dy in [(-border_width, 0), (border_width, 0), (0, -border_width), (0, border_width),
+                        (-border_width, -border_width), (border_width, -border_width),
+                        (-border_width, border_width), (border_width, border_width)]:
+                border_surface = font.render(text, True, border_color)
+                surface.blit(border_surface, text_rect.move(dx, dy))
+
+            # Vẽ text chính ở trung tâm
+            surface.blit(text_surface, text_rect)
+        
         # Vẽ text phụ
         if elapsed_time < 2000:  # Chỉ hiển thị trong 2 giây đầu
-            sub_text = self.sub_font.render("CLICK RESET TO REPLAY!", True, YELLOW)
-            sub_rect = sub_text.get_rect(center=(self.SCREEN_WIDTH//2, self.SCREEN_HEIGHT//2 + 80))
-            sub_surface = pygame.Surface(sub_text.get_size(), pygame.SRCALPHA)
-            sub_surface.blit(sub_text, (0, 0))
-            sub_surface.set_alpha(self.fade_alpha)
+            sub_text = "CLICK RESET TO REPLAY!"
+            sub_font = self.sub_font
+            sub_position = (self.SCREEN_WIDTH // 2, self.SCREEN_HEIGHT // 2 + 80)
+            
+            # Tạo một Surface bán trong suốt cho text
+            sub_surface = pygame.Surface(self.sub_font.size(sub_text), pygame.SRCALPHA)
+            draw_text_with_border(sub_surface, sub_text, sub_font, sub_surface.get_rect(center=(sub_surface.get_width() // 2, sub_surface.get_height() // 2)).center, YELLOW, RED)
+            
+            sub_surface.set_alpha(self.fade_alpha)  # Đặt độ mờ cho text
+            sub_rect = sub_surface.get_rect(center=sub_position)
             self.overlay.blit(sub_surface, sub_rect)
         
         # Vẽ overlay lên màn hình chính
