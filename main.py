@@ -225,7 +225,7 @@ class MapSelectPopup:
             button.draw(self.surface)
         
         # Draw border
-        pygame.draw.rect(self.surface, BLACK, (0, 0, self.popup_width, self.popup_height), 2, border_radius=10)
+        pygame.draw.rect(self.surface, WHITE, (0, 0, self.popup_width, self.popup_height), 2, border_radius=10)
         
         # Draw popup on screen
         screen.blit(self.surface, (self.x, self.y))
@@ -262,7 +262,7 @@ PANEL_BACKGROUND = (255, 255, 255, 180)  # White with some transparency
 
 # Panel dimensions
 PANEL_MARGIN = 20
-PANEL_WIDTH = 250
+PANEL_WIDTH = 320
 
 TILE_SIZE = 64
 folder = "images2/"
@@ -306,7 +306,7 @@ def load_background(filename):
         return None
 
 # Create a transparent surface for panels
-def create_transparent_surface(width, height, alpha=180):
+def create_transparent_surface(width, height, alpha=140):
     surface = pygame.Surface((width, height), pygame.SRCALPHA)
     surface.fill((255, 255, 255, alpha))
     return surface
@@ -316,7 +316,7 @@ class Panel:
         self.rect = pygame.Rect(x, y, width, height)
         self.title = title
         self.color = PANEL_BACKGROUND
-        self.border_color = BLACK
+        self.border_color = WHITE
         self.title_font = pygame.font.SysFont(None, 24)
         self.transparent_surface = create_transparent_surface(width, height)
 
@@ -486,6 +486,8 @@ class SokobanMap:
         self.is_auto_playing = False
         self.move_delay = 500
         self.last_move_time = 0
+        self.weights = 0
+        self.weights_arr = []
         
 
     def start_solving(self, algorithm):
@@ -499,9 +501,8 @@ class SokobanMap:
         # Create a function to handle the solving process
         def solve_process():
             print(self.file_name[6:8], algorithm)
-            self.auto_moves, _ = solve_with_strategy(self.file_name[6:8], algorithm)
+            self.auto_moves, self.weights_arr = solve_with_strategy(self.file_name[6:8], algorithm)
             # print(self.auto_moves)
-            self.auto_moves = self.auto_moves.upper()
             # print(self.auto_moves)
             
             # print(solve_with_strategy(self.file_name[6:8], algorithm))
@@ -535,6 +536,7 @@ class SokobanMap:
         self.goals = self.find_goals()
         self.boxes = self.find_boxes()
         self.steps = 0
+        self.weights = 0
         self.winning = False
         self.current_move_index = 0
         self.is_auto_playing = False
@@ -559,6 +561,9 @@ class SokobanMap:
                 elif char == '@':
                     row.append('floor')
                     self.player_pos = [x, y]  # Vị trí của người chơi
+                elif char == '+':
+                    row.append('goal')
+                    self.player_pos = [x, y]
                 else:
                     row.append('floor')
             self.map.append(row)
@@ -624,11 +629,6 @@ class SokobanMap:
             victory_screen.show()
             victory_screen.draw(screen)
 
-        # Hiển thị số bước
-        # font = pygame.font.SysFont(None, 36)
-        # steps_text = font.render(f"Steps: {self.steps}", True, BLACK)
-        # screen.blit(steps_text, (SCREEN_WIDTH - 300, 600))
-
 
     def move_player(self, dx, dy):
         if dx == 1:
@@ -649,7 +649,7 @@ class SokobanMap:
         elif self.map[new_y][new_x] in ['box', 'boxg']:
             box_new_x = new_x + dx
             box_new_y = new_y + dy
-            
+                        
             if self.map[box_new_y][box_new_x] in ['floor', 'goal']:
                 self.player_pos = [new_x, new_y]
                 self.steps += 1
@@ -685,6 +685,9 @@ class SokobanMap:
         if current_time - self.last_move_time > self.move_delay:
             if self.current_move_index < len(self.auto_moves):
                 move = self.auto_moves[self.current_move_index]
+                if ord(move) < 96:
+                    self.weights += self.weights_arr[self.current_move_index]
+                move = move.upper()
                 if move == 'L':
                     self.move_player(-1, 0)
                 elif move == 'R':
@@ -744,14 +747,6 @@ def main():
         "Controls"
     )
 
-    # Maps panel
-    # maps_panel = Panel(
-    #     right_panel_x,
-    #     controls_panel.rect.bottom + PANEL_MARGIN,
-    #     PANEL_WIDTH,
-    #     200,
-    #     "Select Map"
-    # )
     maps_panel = Panel(
         right_panel_x,
         controls_panel.rect.bottom + PANEL_MARGIN,
@@ -784,15 +779,6 @@ def main():
                          button_width, button_height, "Continue", YELLOW)
     reset_btn = Button(ctrl_x, continue_btn.rect.bottom + button_margin, 
                       button_width, button_height, "Reset", RED)
-
-    # Map selection buttons
-    # map_x = maps_panel.rect.x + (maps_panel.rect.width - button_width) // 2
-    # map1_btn = Button(map_x, maps_panel.rect.y + 40, 
-    #                  button_width, button_height, "Map 1", GREEN)
-    # map2_btn = Button(map_x, map1_btn.rect.bottom + button_margin, 
-    #                  button_width, button_height, "Map 2", GREEN)
-    # map3_btn = Button(map_x, map2_btn.rect.bottom + button_margin, 
-    #                  button_width, button_height, "Map 3", GREEN)
     
     map_x = maps_panel.rect.x + (maps_panel.rect.width - button_width) // 2
     select_map_btn = Button(map_x, maps_panel.rect.y + 40,
@@ -881,12 +867,12 @@ def main():
         if background:
             screen.blit(background, (0, 0))
         else:
-            screen.fill(WHITE)
+            screen.fill(YELLOW)
 
         # Draw semi-transparent game area background
         game_area_background = create_transparent_surface(game_area_rect.width, game_area_rect.height)
         screen.blit(game_area_background, game_area_rect)
-        pygame.draw.rect(screen, BLACK, game_area_rect, 2, border_radius=10)
+        pygame.draw.rect(screen, WHITE, game_area_rect, 2, border_radius=10)
         
         # Draw game
         game_map.draw(screen)
@@ -900,12 +886,22 @@ def main():
 
         # Draw statistics
         stats_font = pygame.font.SysFont(None, 32)
+        
         steps_text = stats_font.render(f"Steps: {game_map.steps}", True, BLACK)
         steps_bg_rect = steps_text.get_rect(topleft=(stats_panel.rect.x + 20, stats_panel.rect.y + 50))
         steps_bg_rect.inflate_ip(20, 10)
         pygame.draw.rect(screen, WHITE, steps_bg_rect, border_radius=5)
-        pygame.draw.rect(screen, BLACK, steps_bg_rect, 1, border_radius=5)
+        pygame.draw.rect(screen, WHITE, steps_bg_rect, 1, border_radius=5)
         screen.blit(steps_text, (stats_panel.rect.x + 20, stats_panel.rect.y + 50))
+        
+        # Vẽ số bước + 3
+        steps_plus_text = stats_font.render(f"Weights: {game_map.weights}", True, BLACK)
+        # Đặt vị trí cách ô steps 20 pixels
+        steps_plus_bg_rect = steps_plus_text.get_rect(topleft=(steps_bg_rect.right + 20, stats_panel.rect.y + 50))
+        steps_plus_bg_rect.inflate_ip(20, 10)
+        pygame.draw.rect(screen, WHITE, steps_plus_bg_rect, border_radius=5)
+        pygame.draw.rect(screen, WHITE, steps_plus_bg_rect, 1, border_radius=5)
+        screen.blit(steps_plus_text, (steps_bg_rect.right + 20, stats_panel.rect.y + 50))
 
         # Draw all buttons
         for button in all_buttons:
