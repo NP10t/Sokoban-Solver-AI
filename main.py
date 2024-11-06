@@ -114,8 +114,6 @@ class VictoryScreen:
 
 vietnam = 0
 
-pygame.init()
-
 class MapSelectPopup:
     def __init__(self):
         self.is_active = False
@@ -241,8 +239,9 @@ class MapSelectPopup:
             # Update button hover state using relative position
             button.update_hover(rel_pos)
 
+pygame.init()
 # Screen setup
-info = pygame.display.Info()
+info = pygame.display.Info()    
 SCREEN_WIDTH = info.current_w - 100
 SCREEN_HEIGHT = info.current_h - 100
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.RESIZABLE)
@@ -732,26 +731,26 @@ def main():
     # Algorithms panel
     algorithms_panel = Panel(
         right_panel_x,
-        stats_panel.rect.bottom + PANEL_MARGIN,
+        stats_panel.rect.bottom + PANEL_MARGIN - 10,
         PANEL_WIDTH,
-        230,
+        220,
         "Algorithms"
     )
 
     # Controls panel
     controls_panel = Panel(
         right_panel_x,
-        algorithms_panel.rect.bottom + PANEL_MARGIN,
+        algorithms_panel.rect.bottom + PANEL_MARGIN - 10,
         PANEL_WIDTH,
-        190,
+        170,
         "Controls"
     )
 
     maps_panel = Panel(
         right_panel_x,
-        controls_panel.rect.bottom + PANEL_MARGIN,
+        controls_panel.rect.bottom + PANEL_MARGIN - 10,
         PANEL_WIDTH,
-        100,  # Giảm chiều cao
+        80, 
         "Select Map"
     )
 
@@ -895,7 +894,7 @@ def main():
         screen.blit(steps_text, (stats_panel.rect.x + 20, stats_panel.rect.y + 50))
         
         # Vẽ số bước + 3
-        steps_plus_text = stats_font.render(f"Weights: {game_map.weights}", True, BLACK)
+        steps_plus_text = stats_font.render(f"Weight: {game_map.weights}", True, BLACK)
         # Đặt vị trí cách ô steps 20 pixels
         steps_plus_bg_rect = steps_plus_text.get_rect(topleft=(steps_bg_rect.right + 20, stats_panel.rect.y + 50))
         steps_plus_bg_rect.inflate_ip(20, 10)
