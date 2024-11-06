@@ -103,3 +103,6 @@ rrRR
 BFS
 Steps: 4, Weight: 20, Node: 14, Time (ms): 12.16, Memory (MB): 0.04
 rrRR
+BFS
+Steps: 4, Weight: 20, Node: 14, Time (ms): 14.93, Memory (MB): 0.04
+rrRR
