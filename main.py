@@ -1,6 +1,7 @@
 import pygame
 import sys
 import math
+from PIL import Image, ImageEnhance
 # from Lam_chi_can_doc_file_nay import *
 import threading
 from SokobanSolver import *
@@ -112,7 +113,7 @@ class VictoryScreen:
         # Vẽ overlay lên màn hình chính
         screen.blit(self.overlay, (0, 0))
 
-vietnam = 0
+vietnam = 1
 
 class MapSelectPopup:
     def __init__(self):
@@ -266,6 +267,30 @@ PANEL_WIDTH = 320
 TILE_SIZE = 64
 folder = "images2/"
 
+def surface_to_pil(surface):
+    """Convert pygame Surface to PIL Image."""
+    data = pygame.image.tostring(surface, "RGBA")
+    width, height = surface.get_size()
+    return Image.frombytes("RGBA", (width, height), data)
+
+def pil_to_surface(pil_img):
+    """Convert PIL Image back to pygame Surface."""
+    mode = pil_img.mode
+    size = pil_img.size
+    data = pil_img.tobytes()
+    return pygame.image.fromstring(data, size, mode)
+
+def apply_dark_overlay(surface, opacity=0.2):
+    # Chuyển pygame Surface sang PIL Image
+    pil_img = surface_to_pil(surface)
+    
+    # Tạo lớp phủ màu đen trong PIL và áp dụng lên ảnh
+    overlay = Image.new("RGBA", pil_img.size, (0, 0, 0, int(255 * opacity)))
+    darkened_image = Image.alpha_composite(pil_img, overlay)
+    
+    # Chuyển PIL Image ngược lại sang pygame Surface
+    return pil_to_surface(darkened_image.convert("RGBA"))
+
 def load_and_scale_image(filename, size=(TILE_SIZE, TILE_SIZE)):
     try:
         image = pygame.image.load(filename)
@@ -287,12 +312,15 @@ IMAGES = {
     'player_up': load_and_scale_image(folder+'playerU.png'),
     'side_floor': load_and_scale_image(folder+'sidefloor.png'),
     'background': (folder+'background.jpg'),
-    'gachvietnam00': load_and_scale_image(folder_gach_Viet_Nam+'gachvietnam00.png'),
-    'gachvietnam01': load_and_scale_image(folder_gach_Viet_Nam+'gachvietnam01.png'),
-    'gachvietnam10': load_and_scale_image(folder_gach_Viet_Nam+'gachvietnam10.png'),
-    'gachvietnam11': load_and_scale_image(folder_gach_Viet_Nam+'gachvietnam11.png'),
+    'gachvietnam00': apply_dark_overlay(load_and_scale_image(folder_gach_Viet_Nam+'gachvietnam00.png')),
+    'gachvietnam01': apply_dark_overlay(load_and_scale_image(folder_gach_Viet_Nam+'gachvietnam01.png')),
+    'gachvietnam10': apply_dark_overlay(load_and_scale_image(folder_gach_Viet_Nam+'gachvietnam10.png')),
+    'gachvietnam11': apply_dark_overlay(load_and_scale_image(folder_gach_Viet_Nam+'gachvietnam11.png')),
     'khantraiban': load_and_scale_image(folder_gach_Viet_Nam+'khantraiban.png'),
     'ngoinha': (folder_gach_Viet_Nam+'ngoinha.jpg'),
+    'duahau': load_and_scale_image(folder_gach_Viet_Nam+'duahau.png'),
+    'duahau_g': load_and_scale_image(folder_gach_Viet_Nam+'duahau_g.png'),
+    'tuongnha': load_and_scale_image(folder_gach_Viet_Nam+'tuongnha.png'),
 }
 
 # Load and scale background image
@@ -609,9 +637,15 @@ class SokobanMap:
                 if cell == 'obs':
                     screen.blit(IMAGES['obs'], (draw_x, draw_y))
                 elif cell == 'box':
-                    screen.blit(IMAGES['box'], (draw_x, draw_y))
+                    if vietnam:
+                        screen.blit(IMAGES['duahau'], (draw_x, draw_y))
+                    else:
+                        screen.blit(IMAGES['box'], (draw_x, draw_y))
                 elif cell == 'boxg':
-                    screen.blit(IMAGES['boxg'], (draw_x, draw_y))
+                    if vietnam:
+                        screen.blit(IMAGES['duahau_g'], (draw_x, draw_y))
+                    else:
+                        screen.blit(IMAGES['boxg'], (draw_x, draw_y))
         
         # Vẽ người chơi
         player_x = game_area_x + (self.player_pos[0] * TILE_SIZE)
