@@ -85,3 +85,6 @@ rrRR
 DFS
 Steps: 4, Weight: 20, Node: 5, Time (ms): 1.08, Memory (MB): 0.02
 rrRR
+BFS
+Steps: 4, Weight: 20, Node: 14, Time (ms): 18.72, Memory (MB): 4.13
+rrRR
