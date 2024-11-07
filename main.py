@@ -5,7 +5,7 @@ from PIL import Image, ImageEnhance
 # from Lam_chi_can_doc_file_nay import *
 import threading
 
-from UI.sokobansolver import *
+from sokobansolver import *
 from victoryscreen import VictoryScreen
 
 vietnam = 1
