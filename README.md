@@ -28,4 +28,4 @@ pip install -r requirements.txt
 ```
 
 ### Demo
-<img src="https://github.com/yuk1s4n/Lab-1---AI/blob/a52058dabed7f83ed83248c1094c5d696b89f449/demo_images/map_10.png" alt="image alt" width="700"/>
+<img src="" alt="image alt" width="700"/>
