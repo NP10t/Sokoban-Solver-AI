@@ -21,21 +21,30 @@ class Item:
 
 class Solver:
     def __init__(self, inputFile):
-        self.firstState = State() # The first state of the matrix
-        self.switches = [] # Coodinates of switches
-        self.firstBoard = [] # The first matrix only includes walls, switches, and positions that stones can't be placed on
-        self.actions = {"u": (-1,0), "U": (-1,0), "l": (0,-1), "L": (0,-1), "d": (1,0), "D": (1,0), "r": (0,1), "R":(0,1)}
-        self.nStones = 0 # Number of stones
+        self.firstState = State()  # The first state of the matrix
+        self.switches = []  # Coodinates of switches
+        self.firstBoard = (
+            []
+        )  # The first matrix only includes walls, switches, and positions that stones can't be placed on
+        self.actions = {
+            "u": (-1, 0),
+            "U": (-1, 0),
+            "l": (0, -1),
+            "L": (0, -1),
+            "d": (1, 0),
+            "D": (1, 0),
+            "r": (0, 1),
+            "R": (0, 1),
+        }
+        # self.actions = {"u": (-1,0), "U": (-1,0), "d": (1,0), "D": (1,0) ,"l": (0,-1), "L": (0,-1), "r": (0,1), "R":(0,1)}
+        self.nStones = 0  # Number of stones
+        self.walls = []
 
-        # Parse input
-        with open(inputFile, 'r') as file:
-            self.lines = file.readlines()
+        self.nRows = 0  # Number of rows
+        self.nCols = 0  # Number of columns
 
-        self.nRows = 0 # Number of rows
-        self.nCols = 0 # Number of columns
-
-        # The list to store where walls start and end on this row    
-        self.wallRows = [] 
+        # The list to store where walls start and end on this row
+        self.wallRows = []
         # The list to store where walls start and end on this column
         self.wallCols = []
 
@@ -49,12 +58,24 @@ class Solver:
         # The bool array to keep track if this column if full of walls
         self.colFullWalls = []
 
+        self.inputFile = inputFile
+        # Parse input
+        self.parseInput()
+
+        # Mark positions that cannot place stones on it
+        self.markPlaces()
+
+    def parseInput(self):
+        # Parse input
+        with open(self.inputFile, "r") as file:
+            self.lines = file.readlines()
+
         countLines = 0
         for line in self.lines:
-            currentLine = line.strip('\n')
+            currentLine = line.strip("\n")
             if countLines == 0:
                 self.wArr = [int(weight) for weight in currentLine.split()]
-            else: 
+            else:
                 row = []
                 # Where walls start
                 wallStart = -1
@@ -68,55 +89,54 @@ class Solver:
                 # Signal: if this row is full of walls
                 signal = True
 
-                if len(currentLine) > self.nCols: # Number of columns
+                if len(currentLine) > self.nCols:  # Number of columns
                     self.nCols = len(currentLine)
 
                 for c in range(len(currentLine)):
-                    if currentLine[c] == '#':
-                        row.append('#')
+                    if currentLine[c] == "#":
+                        row.append("#")
 
-                        if wallStart == -1: # If walls start from here on this row
+                        if wallStart == -1:  # If walls start from here on this row
                             wallStart = c
 
-                        wallEnd = c # Update wallEnd so that it keeps where walls end on this row   
+                        wallEnd = c  # Update wallEnd so that it keeps where walls end on this row
 
-                    elif currentLine[c] == '+' or currentLine[c] == '.':
+                    elif currentLine[c] == "+" or currentLine[c] == ".":
                         # This row has switch
                         flag = True
                         # This row is not full of walls
                         signal = False
 
-                        row.append('.')
-                    elif currentLine[c] == '*':
+                        row.append(".")
+                    elif currentLine[c] == "*":
                         flag = True
                         signal = False
-                        row.append('*')
+                        row.append("*")
                     else:
-                        if currentLine[c] == '@' or currentLine[c] == '$':
+                        if currentLine[c] == "@" or currentLine[c] == "$":
                             # This row is not full of walls
                             signal = False
-                        row.append(' ')
+                        row.append(" ")
 
-                    self.adder(currentLine[c], countLines-1, c) 
+                    self.adder(currentLine[c], countLines - 1, c)
 
                 # Store whether this row has switch
                 self.rowSwitch.append(flag)
 
                 # Store where walls start and end on this row
-                self.wallRows.append((wallStart, wallEnd)) 
+                self.wallRows.append((wallStart, wallEnd))
 
                 # Store whether this row is full of walls
                 self.rowFullWalls.append(signal)
 
                 # Append the row
-                self.firstBoard.append(row)    
+                self.firstBoard.append(row)
             countLines += 1
 
         # Number of columns
         self.nRows = countLines - 1
 
-
-        print("\n")    
+        print("\n")
 
         # Rescrutinize each row whether it is full of walls
         for i in range(self.nRows):
@@ -124,11 +144,11 @@ class Solver:
                 (wallStart, wallEnd) = self.wallRows[i]
                 # signal to check
                 signal = True
-                for j in range(wallStart,wallEnd):
-                    if self.firstBoard[i][j] != '#': # If this is not wall
+                for j in range(wallStart, wallEnd):
+                    if self.firstBoard[i][j] != "#":  # If this is not wall
                         signal = False
                         break
-                self.rowFullWalls[i] = signal    
+                self.rowFullWalls[i] = signal
 
         # Find where walls start and end on columns (of self.firstBoard)
         # Mark column if it has switch on it
@@ -149,14 +169,18 @@ class Solver:
             for j in range(self.nRows):
                 if i >= len(self.firstBoard[j]):
                     continue
-                if self.firstBoard[j][i] == '#':
+                if self.firstBoard[j][i] == "#":
                     if wallStart == -1:
-                        wallStart = j # Update wallStart only once
-                    wallEnd = j # Update wallEnd
-                elif self.firstBoard[j][i] == '.' or self.firstBoard[j][i] == '*' or self.firstBoard[j][i] == '+':
-                    flag = True # This column has switch
+                        wallStart = j  # Update wallStart only once
+                    wallEnd = j  # Update wallEnd
+                elif (
+                    self.firstBoard[j][i] == "."
+                    or self.firstBoard[j][i] == "*"
+                    or self.firstBoard[j][i] == "+"
+                ):
+                    flag = True  # This column has switch
                     signal = False
-                elif self.firstBoard[j][i] == '@' or self.firstBoard[j][i] == '$':
+                elif self.firstBoard[j][i] == "@" or self.firstBoard[j][i] == "$":
                     signal = False
             self.colSwitch.append(flag)
             self.wallCols.append((wallStart, wallEnd))
@@ -168,12 +192,28 @@ class Solver:
                 (wallStart, wallEnd) = self.wallCols[i]
                 signal = True
                 for j in range(wallStart, wallEnd):
-                    if self.firstBoard[j][i] != '#':
+                    if self.firstBoard[j][i] != "#":
                         signal = False
                         break
-                self.colFullWalls[i] = signal    
+                self.colFullWalls[i] = signal
 
-        self.markPlaces()        
+    def adder(self, char, x, y): # x: top to bottom, y: left to right
+        if char == '@':
+            self.firstState.Ares = [x,y]
+        elif char == '+':
+            self.firstState.Ares = [x,y]
+            self.switches.append([x,y])
+        elif char == '$':
+            self.firstState.stones.append([x,y,self.wArr[self.nStones]])
+            self.nStones += 1
+        elif char == '.':
+            self.switches.append([x,y])
+        elif char == '*':
+            self.firstState.stones.append([x,y,self.wArr[self.nStones]])
+            self.nStones += 1
+            self.switches.append([x,y])
+        elif char == '#':
+            self.walls.append([x,y])    
 
     def markPlaces(self):
         # If row x is full of walls, check row x-1 and row x+1 
@@ -213,21 +253,7 @@ class Solver:
                                 self.firstBoard[j][i+1] != '#':
                                     self.firstBoard[j][i+1] = '!'
 
-    def adder(self, char, x, y): # x: top to bottom, y: left to right
-        if char == '@':
-            self.firstState.Ares = [x,y]
-        elif char == '+':
-            self.firstState.Ares = [x,y]
-            self.switches.append((x,y))
-        elif char == '$':
-            self.firstState.stones.append([x,y,self.wArr[self.nStones]])
-            self.nStones += 1
-        elif char == '.':
-            self.switches.append([x,y])
-        elif char == '*':
-            self.firstState.stones.append([x,y,self.wArr[self.nStones]])
-            self.nStones += 1
-            self.switches.append([x,y])
+    
 
 
     def generateChild(self, currentState, path, action): # currentState, path, action are deepcopy versions
@@ -299,43 +325,6 @@ class Solver:
 
         return Item(currentState, path)
 
-
-    def display(self):
-        print("\nAres: ", self.firstState.Ares)
-        print("Weights of stones: ", end="")
-        for w in self.wArr:
-            print(str(w) + " ", end="")
-        print("\nStones coordinates: ")    
-        for stone in self.firstState.stones:
-            print(stone)
-        print("\n")    
-        for row in self.firstBoard:
-            print(row)   
-        print("\nCoordinates of switches:")
-        for switch in self.switches:
-            print(switch)
-        print("\n")  
-        for action in self.actions.keys():
-            if action.islower():
-                print("low")
-            else:
-                print("up")
-
-    def makeBoard(self, currentState): # This function makes a board based on the currentState
-        board = deepcopy(self.firstBoard)
-        Ares = currentState.Ares
-        if board[Ares[0]][Ares[1]] == '.': # Ares stands on switch
-            board[Ares[0]][Ares[1]] = '+'
-        else:
-            board[Ares[0]][Ares[1]] = '@'
-
-        for stone in currentState.stones:
-            if board[stone[0]][stone[1]] == '.' or board[stone[0]][stone[1]] == '*':
-                board[stone[0]][stone[1]] = '*'
-            else:
-                board[stone[0]][stone[1]] = '$'
-        return board        
-
     def isGoalState(self, currentState):
         for stone in currentState.stones:
             x = stone[0]
@@ -343,92 +332,40 @@ class Solver:
             if self.firstBoard[x][y] != '.' and self.firstBoard[x][y] != '*':
                 return False
         return True    
-
-    def isStone(self, x, y, board):
-        if board[x][y] == '$' or board[x][y] == '*':
-            return True
-        return False
-
-    def checkBlockedByStones(self, currentState, board): 
-        """
-        $$
-        $$
-        """
-        for stone in currentState.stones:
-            x = stone[0]
-            y = stone[1]
-            if board[x][y] == '.' or board[x][y] == '*':
-                continue
-            # print("x = ", x, " y = ", y)
-            """
-            s$
-            $$
-            """
-            if y+1 < self.wallRows[x+1][1] and \
-                    self.isStone(x,y+1,board) and self.isStone(x+1,y,board) and self.isStone(x+1,y+1,board):
-                        return True
-            """
-            $$
-            s$
-            """
-            if y+1 < self.wallRows[x-1][1] and \
-                    self.isStone(x,y+1,board) and self.isStone(x-1,y,board) and self.isStone(x-1,y+1,board):
-                        return True
-            """
-            $$
-            $s
-            """
-            if self.isStone(x-1,y-1,board) and self.isStone(x,y-1,board) and self.isStone(x-1,y,board):
-                return True
-            """
-            $s
-            $$
-            """
-            if self.isStone(x,y-1,board) and self.isStone(x+1,y-1,board) and self.isStone(x+1,y,board):
-                return True
-        return False       
-
-    def checkRoundCornered(self, currentState, board): # There is a stone that's cannot be moved
-        for stone in currentState.stones:
-            x = stone[0]
-            y = stone[1]
-            if (board[x][y] == '.' or board[x][y] == '*'):
-                continue
-            if (board[x-1][y] == '#' and board[x][y-1] == '#'):
-                """ 
-                     #   
-                    #s
-                """
-                return True
-            if (board[x-1][y] == '#' and board[x][y+1] == '#'):
-                """
-                    #
-                    s#
-                """
-                return True
-            if (board[x][y-1] == '#' and board[x+1][y] == '#'):
-                """
-                    #s
-                     #
-                """
-                return True
-            if (board[x][y+1] == '#' and board[x+1][y] == '#'):
-                """
-                    s#
-                    #
-                """
-                return True
-        return False    
-
+    
     def checkDeadLock(self, currentState):
-        copiedState = deepcopy(currentState)
-        board = self.makeBoard(copiedState)
+        rotatePattern = [[0,1,2,3,4,5,6,7,8], # No rotation
+                         [2,5,8,1,4,7,0,3,6], # Inverse clockwise rotate 90
+                         [0,1,2,3,4,5,6,7,8][::-1], # clockwise rotate 180
+                         [2,5,8,1,4,7,0,3,6][::-1]] # clockwise rotate 90
+        flipPattern = [[2,1,0,5,4,3,8,7,6], # flip vertically
+                       [0,3,6,1,4,7,2,5,8], # flip horizontally
+                       [2,1,0,5,4,3,8,7,6][::-1], 
+                       [0,3,6,1,4,7,2,5,8][::-1]]
+        allPattern = rotatePattern + flipPattern
 
-        if self.checkBlockedByStones(copiedState, board):
-            return True
-        if self.checkRoundCornered(copiedState, board):
-            return True
-        for stone in copiedState.stones:
+        stones = []
+        for stone in currentState.stones:
+            x = stone[0]
+            y = stone[1]
+            stones.append([x,y])
+
+        for stone in stones:
+            x = stone[0]
+            y = stone[1]
+            if self.firstBoard[x][y] != '.' and self.firstBoard[x][y] != '*':
+                board = [[stone[0]-1, stone[1]-1], [stone[0]-1, stone[1]], [stone[0]-1, stone[1]+1],
+                         [stone[0],stone[1]-1], [stone[0], stone[1]], [stone[0], stone[1]+1],
+                         [stone[0]+1, stone[1]-1], [stone[0]+1, stone[1]], [stone[0]+1, stone[1]+1]]
+                for pattern in allPattern:
+                    newBoard = [board[i] for i in pattern]
+                    if newBoard[1] in self.walls and newBoard[5] in self.walls: return True
+                    elif newBoard[1] in stones and newBoard[2] in self.walls and newBoard[5] in self.walls: return True
+                    elif newBoard[1] in stones and newBoard[2] in self.walls and newBoard[5] in stones: return True
+                    elif newBoard[1] in stones and newBoard[2] in stones and newBoard[5] in stones: return True
+                    elif newBoard[1] in stones and newBoard[6] in stones and newBoard[2] in self.walls and newBoard[3] in self.walls and newBoard[8] in self.walls: return True
+        
+        for stone in stones:
             x = stone[0]
             y = stone[1]
             if self.firstBoard[x][y] == '!':
@@ -501,8 +438,11 @@ class Solver:
         # Calculate the priority of firstState
         hVal = self.calculateHeuristic(self.firstState)
 
+        # count is used to determine the order of items  when there are two more items have the same priority
+        count = 0
+
         # Push the item
-        heapq.heappush(frontier, (hVal, item))
+        heapq.heappush(frontier, (hVal, count, item))
 
         # Visited items
         visitedStates = []
@@ -515,9 +455,9 @@ class Solver:
                 mem_after = process.memory_info().rss
                 # write Output
                 self.writeOutput(False, "A*", 0, nodes, "", end-start, mem_after - mem_before, fileNumber)
-                return 0
+                return False
 
-            priority, item = heapq.heappop(frontier)
+            priority, order, item = heapq.heappop(frontier)
             nodes += 1
             currentState = item.state
             path = item.path
@@ -552,14 +492,15 @@ class Solver:
                 if self.isVisited(child.state, visitedStates) == False:
                     hVal = self.calculateHeuristic(child.state)
                     cost = self.calculateCost(child.path)
-                    heapq.heappush(frontier, (hVal + cost, child))
+                    count += 1
+                    heapq.heappush(frontier, (hVal + cost, count, child))
 
 
     def Ucs(self, fileNumber):       
         # Start timer
         start = time()
         nodes = 0
-        
+
         # Get the current info of RAM
         process = psutil.Process()
         mem_before = process.memory_info().rss
@@ -573,8 +514,11 @@ class Solver:
         # First item includes firstState and empty path 
         item = Item(self.firstState, path)
 
+        # count is used to determine the order of items when there are two items have the same priority
+        count = 0
+
         # Push the item
-        heapq.heappush(frontier, (0, item))
+        heapq.heappush(frontier, (0, count, item))
 
         # Visited items
         visitedStates = []
@@ -587,12 +531,17 @@ class Solver:
                 mem_after = process.memory_info().rss
                 # write Output
                 self.writeOutput(False, "UCS", 0, nodes, "", end-start, mem_after - mem_before, fileNumber)
-                return 0
+                return False
 
-            priority, item = heapq.heappop(frontier)
+            priority, order, item = heapq.heappop(frontier)
             nodes += 1
             currentState = item.state
             path = item.path
+
+            #board = self.makeBoard(currentState)
+            #for row in board:
+                #print(row)
+            #print("\n")    
 
             # Check goal state first
             if self.isGoalState(currentState):
@@ -623,7 +572,8 @@ class Solver:
 
                 if self.isVisited(child.state, visitedStates) == False:
                     cost = self.calculateCost(child.path)
-                    heapq.heappush(frontier, (cost, child))
+                    count += 1
+                    heapq.heappush(frontier, (cost, count, child))
 
 
     def Bfs(self, fileNumber):
@@ -766,16 +716,13 @@ class Solver:
                     visitedStates.append(child.state)
                     self.stack.append(child)
 
-
-
-
 def solve_with_strategy(file, algo):
     # print("tao la yua")
     # file = "01"
     inputFile = os.path.join(os.getcwd(), 'input-'+file+'.txt')
     sokobanBoard = Solver(inputFile)
-    
-    
+        
+        
     data = []
     print(algo)
     if algo == "bfs":
@@ -786,12 +733,17 @@ def solve_with_strategy(file, algo):
         data = sokobanBoard.Ucs(file)
     elif algo == "a*":
         data = sokobanBoard.AStar(file)
-    
+        
     path = ''.join(item[0] for item in data)
     weights = [item[1] for item in data]
-    
+        
     return path, weights
 
-# a, _ = solve_with_strategy("01", "dfs")
-# print("x")
-# print(a)
+    # a, _ = solve_with_strategy("01", "dfs")
+    # print("x")
+    # print(a)
+
+
+
+
+    
