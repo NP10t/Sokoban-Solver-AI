@@ -273,7 +273,7 @@ SCREEN_HEIGHT = info.current_h - 100
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.RESIZABLE)
 pygame.display.set_caption("Sokoban Game")
 
-pygame.mixer.music.load("music/Annie Zhou - Lunar New Year Overture.mp3")
+pygame.mixer.music.load("music/asian-new-year-celebration-144761.mp3")
 
 # Lặp lại âm thanh
 pygame.mixer.music.play(-1)
