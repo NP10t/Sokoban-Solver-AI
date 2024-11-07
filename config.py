@@ -1,0 +1,14 @@
+TILE_SIZE = 64
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+GRAY = (200, 200, 200)
+# YELLOW = (255, 205, 0)
+YELLOW = (240,140,22)
+GREEN = (0, 255, 0)
+# RED = (255, 0, 0)
+RED = (155, 36, 35)
+GREEN = (103,182,143)
+
+# Panel dimensions
+PANEL_MARGIN = 20
+PANEL_WIDTH = 320
