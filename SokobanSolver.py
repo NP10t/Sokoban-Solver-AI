@@ -657,6 +657,7 @@ class Solver:
                 self.writeOutput(True, "BFS", len(path), nodes, path, end-start, mem_after - mem_before, fileNumber)
                 return path
 
+            # print(currentState.Ares, "      ", currentState.stones)
             # Check Deadlock
             if self.checkDeadLock(currentState):
                 continue
@@ -676,6 +677,7 @@ class Solver:
                     self.queue.append(child)
 
     def Dfs(self, fileNumber):
+        
         # Start timer
         start = time()
         nodes = 0
@@ -749,3 +751,25 @@ class Solver:
 
 
 
+def solve_with_strategy(file, algo):
+    inputFile = os.path.join(os.getcwd(), 'input-'+file+'.txt')
+    sokobanBoard = Solver(inputFile)
+    
+    
+    data = []
+    print(algo)
+    if algo == "bfs":
+        data = sokobanBoard.Bfs(file)
+    elif algo == "dfs":
+        data = sokobanBoard.Dfs(file)
+    elif algo == "ucs":
+        data = sokobanBoard.Ucs(file)
+    elif algo == "a*":
+        data = sokobanBoard.AStar(file)
+    
+    path = ''.join(item[0] for item in data)
+    weights = [item[1] for item in data]
+    
+    return path, weights
+
+# print(solve_with_strategy("02", "bfs"))
